@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTP Verification</title>
+</head>
+<body>
+  <h1>OTP Verification</h1>
+  <form id="emailForm">
+    <label for="email">Enter your email:</label>
+    <input type="email" id="email" name="email" required>
+    <button type="submit">Send OTP</button>
+  </form>
+
+  <div id="otpSection" style="display: none;">
+    <h2>Verify OTP</h2>
+    <form id="otpForm">
+      <label for="otp">Enter OTP:</label>
+      <input type="text" id="otp" name="otp" required>
+      <button type="submit">Verify OTP</button>
+    </form>
+  </div>
+
+  <p id="message"></p>
+
+  <script>
+    const emailForm = document.getElementById('emailForm');
+    const otpSection = document.getElementById('otpSection');
+    const otpForm = document.getElementById('otpForm');
+    const message = document.getElementById('message');
+
+    let userEmail = '';
+
+    emailForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      userEmail = document.getElementById('email').value;
+
+      const response = await fetch('/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: userEmail }),
+      });
+
+      const result = await response.json();
+      message.textContent = result.message;
+
+      if (response.ok) {
+        emailForm.style.display = 'none';
+        otpSection.style.display = 'block';
+      }
+    });
+
+    otpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const otp = document.getElementById('otp').value;
+
+      const response = await fetch('/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: userEmail, otp }),
+      });
+
+      const result = await response.json();
+      message.textContent = result.message;
+    });
+  </script>
+</body>
+</html>
