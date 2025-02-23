@@ -29,13 +29,16 @@
     const otpSection = document.getElementById('otpSection');
     const otpForm = document.getElementById('otpForm');
     const message = document.getElementById('message');
-
+  
     let userEmail = '';
-
+  
     emailForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       userEmail = document.getElementById('email').value;
-
+  
+      // Show message before making request
+      message.textContent = "OTP sent successfully. Please wait for OTP verification.";
+  
       const response = await fetch('/send-otp', {
         method: 'POST',
         headers: {
@@ -43,20 +46,22 @@
         },
         body: JSON.stringify({ email: userEmail }),
       });
-
+  
       const result = await response.json();
-      message.textContent = result.message;
-
+  
       if (response.ok) {
         emailForm.style.display = 'none';
         otpSection.style.display = 'block';
+        message.textContent = ""; // Remove message when OTP section appears
+      } else {
+        message.textContent = result.message; // Show error message if request fails
       }
     });
-
+  
     otpForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const otp = document.getElementById('otp').value;
-
+  
       const response = await fetch('/verify-otp', {
         method: 'POST',
         headers: {
@@ -64,10 +69,12 @@
         },
         body: JSON.stringify({ email: userEmail, otp }),
       });
-
+  
       const result = await response.json();
       message.textContent = result.message;
     });
   </script>
+  
+  
 </body>
 </html>
